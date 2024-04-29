@@ -15,6 +15,7 @@ namespace MathStatLab2.ViewModels
     {
         private string _selectedDistribution;
         private int _sampleSize;
+        private double _smoothingParameter = 0.5;
         private double _parameter1;
         private double _parameter2;
         private PlotModel _distributionPlotModel;
@@ -30,6 +31,12 @@ namespace MathStatLab2.ViewModels
         {
             get { return _sampleSize; }
             set { SetProperty(ref _sampleSize, value); }
+        }
+
+        public double SmoothingParameter
+        {
+            get { return _smoothingParameter; }
+            set { SetProperty(ref _smoothingParameter, value); }
         }
 
         public double Parameter1
@@ -104,7 +111,7 @@ namespace MathStatLab2.ViewModels
             if (generator != null)
             {
                 var numbers = generator.GenerateRandomNumbers(SampleSize);
-                UpdatePlots(numbers,generator);
+                UpdatePlots(numbers, generator, SmoothingParameter);
             }
             else
             {
@@ -112,14 +119,14 @@ namespace MathStatLab2.ViewModels
             }
         }
 
-        private void UpdatePlots(List<double> numbers, IRandomNumberGenerator generator)
+        private void UpdatePlots(List<double> numbers, IRandomNumberGenerator generator, double smoothingParameter)
         {            
-            DensityPlotModel = InitializeDensityPlotModel(numbers, generator);
-            DistributionPlotModel = InitializeDistributionPlotModel(numbers, generator);
+            DensityPlotModel = InitializeDensityPlotModel(numbers, generator, smoothingParameter);
+            DistributionPlotModel = InitializeDistributionPlotModel(numbers, generator, smoothingParameter);
             FinalizePlots();
         }
 
-        private PlotModel InitializeDensityPlotModel(List<double> numbers, IRandomNumberGenerator generator)
+        private PlotModel InitializeDensityPlotModel(List<double> numbers, IRandomNumberGenerator generator, double smoothingParameter)
         {
             numbers.Sort();
             var min = numbers.Min();
@@ -127,12 +134,12 @@ namespace MathStatLab2.ViewModels
             var densityModel = new PlotModel { Title = "Density Plot" };
             AddDensityHistogram(densityModel, numbers, min, max);
             AddTrueDensityLine(densityModel, min, max, generator);
-            AddSmoothedDensityLine(densityModel, numbers, min, max);
+            AddSmoothedDensityLine(densityModel, numbers, min, max, smoothingParameter);
 
             return densityModel;
         }
 
-        private PlotModel InitializeDistributionPlotModel(List<double> numbers, IRandomNumberGenerator generator)
+        private PlotModel InitializeDistributionPlotModel(List<double> numbers, IRandomNumberGenerator generator, double smoothingParameter)
         {
             numbers.Sort();
             var min = numbers.Min();
@@ -140,7 +147,7 @@ namespace MathStatLab2.ViewModels
             var distributionModel = new PlotModel { Title = "Cumulative Distribution Plot" };
             AddCumulativeDistributionLine(distributionModel, numbers);
             AddTrueDistributionLine(distributionModel, min, max, generator);
-            AddSmoothedCDFLine(distributionModel, numbers, min, max);
+            AddSmoothedCDFLine(distributionModel, numbers, min, max, smoothingParameter);
 
             return distributionModel;
         }
@@ -191,7 +198,7 @@ namespace MathStatLab2.ViewModels
 
             model.Series.Add(trueDensitySeries);
         }
-        private void AddSmoothedDensityLine(PlotModel model, List<double> numbers, double min, double max)
+        private void AddSmoothedDensityLine(PlotModel model, List<double> numbers, double min, double max, double smoothingParameter)
         {
             var smoothedDensitySeries = new LineSeries
             {
@@ -200,7 +207,7 @@ namespace MathStatLab2.ViewModels
                 Title = "Smoothed Density (Parzen-Rosenblatt)"
             };
 
-            var smoothedDistribution = new SmoothedDistribution(numbers, 0.5);
+            var smoothedDistribution = new SmoothedDistribution(numbers, smoothingParameter);
             double step = (max - min) / 100;
             for (double x = min; x <= max; x += step)
             {
@@ -241,7 +248,7 @@ namespace MathStatLab2.ViewModels
 
             model.Series.Add(trueDistributionSeries);
         }
-        private void AddSmoothedCDFLine(PlotModel model, List<double> numbers, double min, double max)
+        private void AddSmoothedCDFLine(PlotModel model, List<double> numbers, double min, double max, double smoothingParameter)
         {
             var smoothedSeries = new LineSeries
             {
@@ -250,7 +257,7 @@ namespace MathStatLab2.ViewModels
                 Title = "Smoothed CDF"
             };
 
-            var smoothedDistribution = new SmoothedDistribution(numbers, 0.5);
+            var smoothedDistribution = new SmoothedDistribution(numbers, smoothingParameter);
             double step = (max - min) / 100;
             for (double x = min; x <= max; x += step)
             {
