@@ -79,8 +79,7 @@ namespace MathStatLab2.ViewModels
         private void Generate()
         {
             IRandomNumberGenerator generator = null;
-
-            // Определение генератора в зависимости от выбранного распределения
+            
             switch (SelectedDistribution)
             {
                 case "Normal":
@@ -93,7 +92,6 @@ namespace MathStatLab2.ViewModels
                     generator = new UniformDistributionGenerator(Parameter1, Parameter2);
                     break;
                 case "Binomial":
-                    // Предположим, что Parameter1 - это количество испытаний (trials), а Parameter2 - вероятность успеха (probability)
                     generator = new BinomialDistributionGenerator((int)Parameter1, Parameter2);
                     break;
                 case "Poisson":
@@ -149,31 +147,32 @@ namespace MathStatLab2.ViewModels
 
         private void AddDensityHistogram(PlotModel model, List<double> numbers, double min, double max)
         {
-            var densitySeries = new HistogramSeries
+            var histogramSeries = new LineSeries
             {
                 StrokeThickness = 2,
-                StrokeColor = OxyColors.Black,
-                FillColor = OxyColors.SkyBlue
+                Color = OxyColors.Black
             };
 
-            // Вычисление стандартного отклонения выборки
-            double mean = numbers.Average();
-            double sumOfSquaresOfDifferences = numbers.Sum(val => (val - mean) * (val - mean));
-            double stddev = Math.Sqrt(sumOfSquaresOfDifferences / numbers.Count);
+            var sortedNumbers = numbers.OrderBy(n => n).ToList();
+            double q1 = sortedNumbers[(int)(0.25 * sortedNumbers.Count)];
+            double q3 = sortedNumbers[(int)(0.75 * sortedNumbers.Count)];
+            double iqr = q3 - q1;
 
-            // Применение правила Скотта для определения размера корзины
-            double binSize = 3.49 * stddev * Math.Pow(numbers.Count, -1.0 / 3.0);
-            int binsCount = (int)Math.Ceiling((max - min) / binSize);
+            double binSize = 2 * iqr * Math.Pow(numbers.Count, -1.0 / 3.0);
+            double normalizationFactor = 1 / (numbers.Count * binSize);
 
-            for (double x = min; x < max; x += binSize)
+            for (double x = min; x <= max; x += binSize)
             {
                 var count = numbers.Count(n => n >= x && n < x + binSize);
-                // Нормализация для получения оценочной плотности
-                var density = count / (numbers.Count * binSize);
-                densitySeries.Items.Add(new HistogramItem(x, x + binSize, density, 1));
+                double height = count * normalizationFactor;
+                histogramSeries.Points.Add(new DataPoint(x, 0));
+                histogramSeries.Points.Add(new DataPoint(x, height));
+                histogramSeries.Points.Add(new DataPoint(x + binSize, height));
+                histogramSeries.Points.Add(new DataPoint(x + binSize, 0));
+                histogramSeries.Points.Add(DataPoint.Undefined);
             }
 
-            model.Series.Add(densitySeries);
+            model.Series.Add(histogramSeries);
         }
         private void AddTrueDensityLine(PlotModel model, double min, double max, IRandomNumberGenerator generator)
         {

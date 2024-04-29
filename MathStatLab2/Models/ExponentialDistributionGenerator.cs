@@ -8,7 +8,7 @@ namespace MathStatLab2.Models
 {
     public class ExponentialDistributionGenerator : IRandomNumberGenerator
     {
-        private readonly double lambda; // Параметр интенсивности
+        private readonly double lambda;
 
         public ExponentialDistributionGenerator(double lambda)
         {

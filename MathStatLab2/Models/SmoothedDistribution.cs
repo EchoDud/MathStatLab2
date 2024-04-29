@@ -9,7 +9,7 @@ namespace MathStatLab2.Models
     public class SmoothedDistribution : IDistribution
     {
         private readonly List<double> sample;
-        private readonly double h; // Шаг сглаживания
+        private readonly double h;
 
         public SmoothedDistribution(List<double> sample, double h)
         {
@@ -44,7 +44,6 @@ namespace MathStatLab2.Models
             return sample.Average(y => IntegratedKernelFunction((x - y) / h));
         }
 
-        // Quantile не реализован из-за сложности вычисления обратной функции
         public double Quantile(double alpha)
         {
             throw new NotImplementedException();

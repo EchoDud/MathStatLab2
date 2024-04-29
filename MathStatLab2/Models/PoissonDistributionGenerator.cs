@@ -8,7 +8,7 @@ namespace MathStatLab2.Models
 {
     public class PoissonDistributionGenerator : IRandomNumberGenerator
     {
-        private readonly double lambda; // Среднее количество событий за интервал
+        private readonly double lambda;
 
         public PoissonDistributionGenerator(double lambda)
         {
