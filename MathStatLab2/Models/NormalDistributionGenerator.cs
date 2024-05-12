@@ -8,8 +8,8 @@ namespace MathStatLab2.Models
 {
     public class NormalDistributionGenerator : IRandomNumberGenerator
     {
-        private readonly double mean; // Среднее значение (мю)
-        private readonly double stddev; // Стандартное отклонение (сигма)
+        private readonly double mean;
+        private readonly double stddev;
 
         public NormalDistributionGenerator(double mean, double stddev)
         {
@@ -24,13 +24,10 @@ namespace MathStatLab2.Models
 
             for (int i = 0; i < size; i++)
             {
-                // Используем Box-Muller transform для генерации
-                double u1 = 1.0 - rng.NextDouble(); // равномерное распределение в интервале (0,1]
+                double u1 = 1.0 - rng.NextDouble();
                 double u2 = 1.0 - rng.NextDouble();
-                double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); // случайная величина с нормальным распределением, мю=0, сигма=1
-                double randNormal =
-                    mean + stddev * randStdNormal; // масштабирование и сдвиг
-
+                double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+                double randNormal = mean + stddev * randStdNormal;
                 numbers.Add(randNormal);
             }
 
@@ -44,7 +41,6 @@ namespace MathStatLab2.Models
 
         public double Cdf(double x)
         {
-            // Адаптированная реализация cdf из вашего примера
             double z = (x - mean) / stddev;
             if (z <= 0)
             {
@@ -55,8 +51,6 @@ namespace MathStatLab2.Models
 
         public double Quantile(double alpha)
         {
-            // Это приближенное вычисление и следует использовать специализированную функцию или библиотеку для точных вычислений
-            // Простая аппроксимация квантиля нормального распределения
             if (alpha < 0.5)
             {
                 return mean - Math.Sqrt(-2 * Math.Log(1 - alpha)) * stddev;

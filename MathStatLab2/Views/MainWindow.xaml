@@ -6,7 +6,10 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:MathStatLab2.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1024">
+        Title="MainWindow" Height="720" Width="1280">
+	<Window.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</Window.Resources>
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
@@ -21,10 +24,19 @@
             <ComboBox ItemsSource="{Binding AvailableDistributions}" SelectedItem="{Binding SelectedDistribution}" Width="120"/>
             <TextBlock Text="Sample Size:" VerticalAlignment="Center" Margin="10,0,5,0"/>
             <TextBox Text="{Binding SampleSize, UpdateSourceTrigger=PropertyChanged}" Width="60"/>
-            <TextBlock Text="Parameter 1:" VerticalAlignment="Center" Margin="10,0,5,0"/>
-            <TextBox Text="{Binding Parameter1, StringFormat=\{0:f4\}, UpdateSourceTrigger=PropertyChanged}" Width="60"/>
-            <TextBlock Text="Parameter 2:" VerticalAlignment="Center" Margin="10,0,5,0"/>
-            <TextBox Text="{Binding Parameter2, StringFormat=\{0:f4\}, UpdateSourceTrigger=PropertyChanged}" Width="60"/>
+			<TextBlock Text="{Binding Parameter1Name}" VerticalAlignment="Center" Margin="10,0,5,0"
+                       Visibility="{Binding IsParameter1Visible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+			<TextBox Text="{Binding Parameter1}"
+                 Width="100" Height="30" Margin="10,0,0,0"
+                 Visibility="{Binding IsParameter1Visible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                 ToolTip="{Binding Parameter1Name}" />
+
+			<TextBlock Text="{Binding Parameter2Name}" VerticalAlignment="Center" Margin="10,0,5,0"
+                       Visibility="{Binding IsParameter2Visible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+			<TextBox Text="{Binding Parameter2}"
+                 Width="100" Height="30" Margin="10,0,0,0"
+                 Visibility="{Binding IsParameter2Visible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                 ToolTip="{Binding Parameter2Name}" />
             <TextBlock Text="Smoothing:" VerticalAlignment="Center" Margin="0,0,5,0"/>
             <Slider x:Name="smoothingSlider" Minimum="0.01" Maximum="1" Value="{Binding SmoothingParameter, Mode=TwoWay}" TickFrequency="0.01" SmallChange="0.01" LargeChange="0.05" Width="200" HorizontalAlignment="Left"/>
             <TextBlock Text="{Binding SmoothingParameter, StringFormat=N2}" VerticalAlignment="Center" Margin="5,0,0,0"/>

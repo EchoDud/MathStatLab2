@@ -18,13 +18,21 @@ namespace MathStatLab2.ViewModels
         private double _smoothingParameter = 0.5;
         private double _parameter1;
         private double _parameter2;
+        private bool _isParameter1Visible;
+        private bool _isParameter2Visible;
+        private string _parameter1Name;
+        private string _parameter2Name;
         private PlotModel _distributionPlotModel;
         private PlotModel _densityPlotModel;
 
         public string SelectedDistribution
         {
             get { return _selectedDistribution; }
-            set { SetProperty(ref _selectedDistribution, value); }
+            set
+            {
+                SetProperty(ref _selectedDistribution, value);
+                UpdateParameterVisibility();
+            }
         }
 
         public int SampleSize
@@ -51,6 +59,30 @@ namespace MathStatLab2.ViewModels
             set { SetProperty(ref _parameter2, value); }
         }
 
+        public bool IsParameter1Visible
+        {
+            get { return _isParameter1Visible; }
+            set { SetProperty(ref _isParameter1Visible, value); }
+        }
+
+        public bool IsParameter2Visible
+        {
+            get { return _isParameter2Visible; }
+            set { SetProperty(ref _isParameter2Visible, value); }
+        }
+
+        public string Parameter1Name
+        {
+            get { return _parameter1Name; }
+            set { SetProperty(ref _parameter1Name, value); }
+        }
+
+        public string Parameter2Name
+        {
+            get { return _parameter2Name; }
+            set { SetProperty(ref _parameter2Name, value); }
+        }
+
         public PlotModel DistributionPlotModel
         {
             get { return _distributionPlotModel; }
@@ -70,13 +102,13 @@ namespace MathStatLab2.ViewModels
         public MainViewModel()
         {
             AvailableDistributions = new List<string>
-        {
-            "Normal",
-            "Exponential",
-            "Uniform",
-            "Binomial",
-            "Poisson"
-        };
+            {
+                "Normal",
+                "Exponential",
+                "Uniform",
+                "Binomial",
+                "Poisson"
+            };
 
             GenerateCommand = new DelegateCommand(Generate);
             DistributionPlotModel = new PlotModel { Title = "Distribution" };
@@ -86,7 +118,7 @@ namespace MathStatLab2.ViewModels
         private void Generate()
         {
             IRandomNumberGenerator generator = null;
-            
+
             switch (SelectedDistribution)
             {
                 case "Normal":
@@ -113,14 +145,49 @@ namespace MathStatLab2.ViewModels
                 var numbers = generator.GenerateRandomNumbers(SampleSize);
                 UpdatePlots(numbers, generator, SmoothingParameter);
             }
-            else
+        }
+
+        private void UpdateParameterVisibility()
+        {
+            switch (SelectedDistribution)
             {
-                
+                case "Normal":
+                    IsParameter1Visible = true;
+                    IsParameter2Visible = true;
+                    Parameter1Name = "Mean";
+                    Parameter2Name = "Standard Deviation";
+                    break;
+                case "Exponential":
+                    IsParameter1Visible = true;
+                    IsParameter2Visible = false;
+                    Parameter1Name = "Lambda";
+                    break;
+                case "Uniform":
+                    IsParameter1Visible = true;
+                    IsParameter2Visible = true;
+                    Parameter1Name = "Minimum";
+                    Parameter2Name = "Maximum";
+                    break;
+                case "Binomial":
+                    IsParameter1Visible = true;
+                    IsParameter2Visible = true;
+                    Parameter1Name = "Trials";
+                    Parameter2Name = "Probability";
+                    break;
+                case "Poisson":
+                    IsParameter1Visible = true;
+                    IsParameter2Visible = false;
+                    Parameter1Name = "Lambda";
+                    break;
+                default:
+                    IsParameter1Visible = false;
+                    IsParameter2Visible = false;
+                    break;
             }
         }
 
         private void UpdatePlots(List<double> numbers, IRandomNumberGenerator generator, double smoothingParameter)
-        {            
+        {
             DensityPlotModel = InitializeDensityPlotModel(numbers, generator, smoothingParameter);
             DistributionPlotModel = InitializeDistributionPlotModel(numbers, generator, smoothingParameter);
             FinalizePlots();
@@ -189,7 +256,7 @@ namespace MathStatLab2.ViewModels
                 Color = OxyColors.Red,
                 Title = "True Density"
             };
-            
+
             double step = (max - min) / 100;
             for (double x = min; x <= max; x += step)
             {
@@ -271,6 +338,5 @@ namespace MathStatLab2.ViewModels
             DensityPlotModel.InvalidatePlot(true);
             DistributionPlotModel.InvalidatePlot(true);
         }
-
     }
 }
