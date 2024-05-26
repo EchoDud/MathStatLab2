@@ -27,20 +27,21 @@
 			<TextBlock Text="{Binding Parameter1Name}" VerticalAlignment="Center" Margin="10,0,5,0"
                        Visibility="{Binding IsParameter1Visible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 			<TextBox Text="{Binding Parameter1}"
-                 Width="100" Height="30" Margin="10,0,0,0"
+                 Width="100" Height="30" Margin="5,0,0,0"
                  Visibility="{Binding IsParameter1Visible, Converter={StaticResource BooleanToVisibilityConverter}}"
                  ToolTip="{Binding Parameter1Name}" />
 
 			<TextBlock Text="{Binding Parameter2Name}" VerticalAlignment="Center" Margin="10,0,5,0"
                        Visibility="{Binding IsParameter2Visible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 			<TextBox Text="{Binding Parameter2}"
-                 Width="100" Height="30" Margin="10,0,0,0"
+                 Width="100" Height="30" Margin="5,0,0,0"
                  Visibility="{Binding IsParameter2Visible, Converter={StaticResource BooleanToVisibilityConverter}}"
                  ToolTip="{Binding Parameter2Name}" />
             <TextBlock Text="Smoothing:" VerticalAlignment="Center" Margin="0,0,5,0"/>
             <Slider x:Name="smoothingSlider" Minimum="0.01" Maximum="1" Value="{Binding SmoothingParameter, Mode=TwoWay}" TickFrequency="0.01" SmallChange="0.01" LargeChange="0.05" Width="200" HorizontalAlignment="Left"/>
             <TextBlock Text="{Binding SmoothingParameter, StringFormat=N2}" VerticalAlignment="Center" Margin="5,0,0,0"/>
             <Button Command="{Binding GenerateCommand}" Content="Generate" Margin="10,0,0,0"/>
+			<CheckBox Content="Auto calculate h" IsChecked="{Binding IsAutoCalculateH}" Margin="10"/>
         </StackPanel>
         <oxy:PlotView Model="{Binding DistributionPlotModel}" Grid.Row="1" Margin="10"/>
         <oxy:PlotView Model="{Binding DensityPlotModel}" Grid.Row="2" Margin="10"/>
